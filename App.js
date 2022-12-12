@@ -1,14 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, Text, View, TextInput, TouchableOpacity, Button, Platform } from 'react-native';
 import * as SQLite from 'expo-sqlite';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
 
+// Eliot Pearson, John Taweel, Yao Zheng, William Lu
 
 
 // expo add expo-sqlite
@@ -83,6 +85,7 @@ function Notes() {
         (txObj, error) => console.log(error)
       );
     });
+
   }
 
   const deleteNote = (id) => {
@@ -122,8 +125,18 @@ function Notes() {
       return (
         <View key={index} style={styles.row}>
           <Text>{note.note}</Text>
-          <Button title='Delete' onPress={() => deleteNote(note.id)} color='#FFDD60' />
-          <Button title='Update' onPress={() => updateNote(note.id)} color='#FFC848' />
+
+          <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
+            <Ionicons name="close-circle-outline" size={30}color='#FFFFFF'></Ionicons>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => updateNote(note.id)} style={styles.updateButton}>
+            <Ionicons name="brush-outline" size={30}color='#FFFFFF'></Ionicons>
+          </TouchableOpacity>
+
+          {/* <Button title='Delete' onPress={() => deleteNote(note.id)} color='#FFDD60' />
+          <Button title='Update' onPress={() => updateNote(note.id)} color='#FFC848' /> */}
+        
         </View>
       );
     });
@@ -134,10 +147,23 @@ function Notes() {
     
     <View style={styles.container}>
       <Text style={styles.titleFont}>Banana Book</Text>
-      <TextInput value={currentNote} placeholder='start typing here...' onChangeText={setCurrentNote} style={styles.textBox}/>
-        <Button title="Add Note" onPress={addNote} color='#FFC848' />
+      
+      <TextInput value={currentNote} 
+      placeholder='start typing here...' 
+      onChangeText={setCurrentNote} 
+      style={styles.textBox} 
+      multiline={true}
+      maxLength={4000}
+      />
+
+        <TouchableOpacity onPress={addNote} style={styles.addButton}>
+          <Ionicons name="add-outline" size={30}color='#FFFFFF'></Ionicons>
+        </TouchableOpacity>
+
         {showNotes()}
         <StatusBar style="auto" />
+        
+      
     </View>
   );
 }
@@ -146,7 +172,8 @@ function Notes() {
 function Folders() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Folder Screen</Text>
+      <Ionicons name="folder-open-outline" size={160}color='#2F1103'></Ionicons>
+      <Text>Oops! You don't have any folders...</Text>
     </View>
   );
 }
@@ -179,7 +206,7 @@ function Utilities() {
 function Camera() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Ionicons name="camera-outline" size={160}color='black'></Ionicons>
+      <Ionicons name="camera-outline" size={160}color='#2F1103'></Ionicons>
       <Text>Camera Functionality Common Soon!</Text>
     </View>
   )
@@ -283,11 +310,25 @@ export default function App() {
     <NavigationContainer>
       <MyDrawer />
     </NavigationContainer>
-    
+
   );
 }
 
 const styles = StyleSheet.create({
+  addButton: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#FFC848',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    elevation: 10,
+    marginBottom: 40,
+    position: 'relative',
+    //bottom: 270,
+    //left: 350,
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 20,
@@ -297,6 +338,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  deleteButton: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#FFDD60',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    elevation: 10,
+    marginBottom: 40,
+    position: 'relative',
+    marginLeft: 150,
   },
   exportButton: {
     padding: 20,
@@ -345,6 +399,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     position: 'relative',
     bottom: 100,
+  },
+  updateButton: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: '#FFC848',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    elevation: 10,
+    marginBottom: 40,
+    position: 'relative',
+    //bottom: 200,
+    //left: 300,
   },
   utilFont: {
     color: '#000000',
