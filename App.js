@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ScrollView, Text, View, TextInput, TouchableOpacity, Button, Platform } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, TextInput, TouchableOpacity, Button, Image, Platform, LogBox } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 import { useState, useEffect, useRef } from 'react';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -125,7 +126,7 @@ function Notes() {
   const showNotes = (note, index) => {
     return (
         <ScrollView style={styles.scrollStyle}>
-        { notes.map((note, index) => {
+        { [...notes].reverse().map((note, index) => {
             return (
                 <View key={index} style={styles.row}>
                     <Text style={styles.textDisplay}>{note.note}</Text>
@@ -170,6 +171,169 @@ function Notes() {
   );
 }
 
+function Camera() {
+    
+
+  const [db, setDb] = useState(SQLite.openDatabase('image.db'));
+  const [isLoading, setIsLoading] = useState(true);
+  const [images, setImages] = useState([]);
+
+  const pickImage = async () => {
+    const cameraPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+    console.log(cameraPermission);
+
+    if(cameraPermission.status !== 'granted') {
+      const test = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    }
+
+    const secondcameraPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+    if(cameraPermission.status === 'granted') {
+    
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [342, 140],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      db.transaction(tx => {
+        tx.executeSql('INSERT INTO images (image) values (?)', [result.assets[0].uri],
+          (txObj, resultSet) => {
+            let existingImages = [...images];
+            existingImages.push({ id: resultSet.insertId, image: result.assets[0].uri});
+            setImages(existingImages);
+          },
+          (txObj, error) => console.warn(error)
+        );
+      });
+    }}
+  };
+
+  const takeImage = async () => {
+    const cameraPermission = await ImagePicker.getCameraPermissionsAsync();
+
+    console.log(cameraPermission);
+
+    if(cameraPermission.status !== 'granted') {
+      const test = await ImagePicker.requestCameraPermissionsAsync();
+    }
+
+    const secondcameraPermission = await ImagePicker.getCameraPermissionsAsync();
+
+    if(cameraPermission.status === 'granted') {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      db.transaction(tx => {
+        tx.executeSql('INSERT INTO images (image) values (?)', [result.assets[0].uri],
+          (txObj, resultSet) => {
+            let existingImages = [...images];
+            existingImages.push({ id: resultSet.insertId, image: result.assets[0].uri});
+            setImages(existingImages);
+          },
+          (txObj, error) => console.warn(error)
+        );
+      });
+    }}
+  };
+  
+
+
+  // creating table to store image data
+  useEffect(() => {
+    LogBox.ignoreAllLogs()
+
+    db.transaction(tx => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, image TEXT)')
+    });
+
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM images', null,
+        (txObj, resultSet) => setImages(resultSet.rows._array),
+        (txObj, error) => console.warn(error)
+      );
+    });
+
+    setIsLoading(false);
+  }, [db]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading Images...</Text>
+      </View>
+    );
+  }
+
+
+  const deleteImage = (id) => {
+    db.transaction(tx => {
+      tx.executeSql('DELETE FROM images WHERE id = ?', [id],
+        (txObj, resultSet) => {
+          if (resultSet.rowsAffected > 0) {
+            let existingImages = [...images].filter(image => image.id !== id);
+            setImages(existingImages);
+          }
+        },
+        (txObj, error) => console.log(error)
+      );
+    });
+  };
+
+  const showImages = (image, index) => {
+    return (
+        <ScrollView style={styles.scrollStyle}>
+        { [...images].reverse().map((image, index) => {
+            return (
+                <View key={index} style={styles.row}>
+                    {image && <Image source={{ uri: image.image }} style={{ minWidth: 342, resizeMode: 'contain', minHeight: 342, backgroundColor: "#F1F1F1", borderRadius:15}} />}
+                    
+                    <TouchableOpacity onPress={() => deleteImage(image.id)} style={styles.deleteIMGButton}>
+                        <Ionicons name="close-circle-outline" size={30}color='#FFFFFF'></Ionicons>
+                    </TouchableOpacity>
+
+                </View>
+            )
+        })}
+        </ScrollView>)
+};
+
+
+  return (
+    
+    <View style={styles.container}>
+      {/* <Text style={styles.titleFont}>Banana Book</Text> */}
+      
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', left:'-9%', marginBottom: '40%', marginTop: '5%'}}>
+      <TouchableOpacity onPress={() => pickImage()} style={styles.newImageButton}>
+        <Ionicons name="file-tray-full-outline" size={90}color='#FFFFFF'></Ionicons>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => takeImage()} style={styles.takePictureButton}>
+          <Ionicons name="camera-outline" size={90}color='#FFFFFF'></Ionicons>
+      </TouchableOpacity>
+      </View>
+
+
+        {showImages()}
+        <StatusBar style="auto" />
+        
+      
+    </View>
+  );
+}
+
 // the Folder tab on the sidebar
 function Folders() {
   return (
@@ -203,15 +367,6 @@ function Utilities() {
         </TouchableOpacity>
     </View>
   );
-}
-
-function Camera() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Ionicons name="camera-outline" size={160}color='#2F1103'></Ionicons>
-      <Text>Camera Functionality Common Soon!</Text>
-    </View>
-  )
 }
 
 function AboutUs() {
@@ -347,7 +502,7 @@ const styles = StyleSheet.create({
     paddingRight: 6,
     paddingTop: 6,
     paddingBottom: 6,
-    backgroundColor: '#FFDD60',
+    backgroundColor: '#FFDD60BF',
     borderRadius: 15,
     shadowColor: '#000000',
     elevation: 10,
@@ -411,10 +566,11 @@ const styles = StyleSheet.create({
   textDisplay: {
     //paddingLeft: 20,
     //paddingRight: 150,
-    height: 140,
+    minHeight: 120,
     width: 342,
     paddingTop: 20,
     paddingLeft: 15,
+    paddingBottom: 20,
     backgroundColor: '#FFFFFF',
     marginBottom: 7,
     borderRadius: 15,
@@ -427,7 +583,7 @@ const styles = StyleSheet.create({
     paddingRight: 6,
     paddingTop: 6,
     paddingBottom: 6,
-    backgroundColor: '#FFC848',
+    backgroundColor: '#FFC848BF',
     borderRadius: 15,
     shadowColor: '#000000',
     elevation: 10,
@@ -479,4 +635,40 @@ const styles = StyleSheet.create({
     bottom: 150,
     left: 225,
   },
+  newImageButton: {
+    padding: 30,
+    backgroundColor: '#FFC848',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    // elevation: 10,
+    // marginBottom: 40,
+    position: 'absolute',
+    top: '10%',
+    left: '-20%',
+  },
+  takePictureButton: {
+    padding: 30,
+    backgroundColor: '#FFC848',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    // elevation: 10,
+    // marginBottom: 40,
+    position: 'absolute',
+    top: '10%',
+    left: '20%',
+  },
+  deleteIMGButton: {
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 6,
+    paddingBottom: 6,
+    backgroundColor: '#FFC84866',
+    borderRadius: 15,
+    shadowColor: '#000000',
+    elevation: 10,
+    marginBottom: 40,
+    position: 'absolute',
+    top: 5,
+    left: 295,
+  }
 });
