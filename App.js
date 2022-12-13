@@ -124,14 +124,16 @@ function Notes() {
 
   const showNotes = (note, index) => {
     return (
-        <ScrollView>
+        <ScrollView style={styles.scrollStyle}>
         { notes.map((note, index) => {
             return (
                 <View key={index} style={styles.row}>
-                    <Text>{note.note}</Text>
+                    <Text style={styles.textDisplay}>{note.note}</Text>
+
                     <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
                         <Ionicons name="close-circle-outline" size={30}color='#FFFFFF'></Ionicons>
                     </TouchableOpacity>
+
                     <TouchableOpacity onPress={() => updateNote(note.id)} style={styles.updateButton}>
                         <Ionicons name="brush-outline" size={30}color='#FFFFFF'></Ionicons>
                     </TouchableOpacity>
@@ -324,10 +326,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     shadowColor: '#000000',
     elevation: 10,
-    marginBottom: 40,
-    position: 'relative',
-    //bottom: 270,
-    //left: 350,
+    marginBottom: 20,
+    position: 'absolute',
+    bottom: 380,
+    left: 350,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -335,7 +337,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFEBB3',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -349,8 +351,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     elevation: 10,
     marginBottom: 40,
-    position: 'relative',
-    marginLeft: 150,
+    position: 'absolute',
+    left: 220,
+    top: 5,
+    //marginLeft: 150,
   },
   exportButton: {
     padding: 20,
@@ -398,7 +402,23 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     borderRadius: 10,
     position: 'relative',
-    bottom: 100,
+    bottom: 10,
+    marginBottom: 55,
+  },
+  textDisplay: {
+    //paddingLeft: 20,
+    //paddingRight: 150,
+    height: 140,
+    width: 342,
+    paddingTop: 20,
+    paddingLeft: 15,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 20,
+    borderRadius: 15,
+
+  },
+  scrollStyle: {
+    width: 350,
   },
   updateButton: {
     paddingLeft: 10,
@@ -410,9 +430,9 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     elevation: 10,
     marginBottom: 40,
-    position: 'relative',
-    //bottom: 200,
-    //left: 300,
+    position: 'absolute',
+    top: 5,
+    left: 280,
   },
   utilFont: {
     color: '#000000',
