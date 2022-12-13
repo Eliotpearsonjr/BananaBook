@@ -120,27 +120,27 @@ function Notes() {
   };
 
 
-  const showNotes = () => {
-    return notes.map((note, index) => {
-      return (
-        <View key={index} style={styles.row}>
-          <Text>{note.note}</Text>
 
-          <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
-            <Ionicons name="close-circle-outline" size={30}color='#FFFFFF'></Ionicons>
-          </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => updateNote(note.id)} style={styles.updateButton}>
-            <Ionicons name="brush-outline" size={30}color='#FFFFFF'></Ionicons>
-          </TouchableOpacity>
+  const showNotes = (note, index) => {
+    return (
+        <ScrollView>
+        { notes.map((note, index) => {
+            return (
+                <View key={index} style={styles.row}>
+                    <Text>{note.note}</Text>
+                    <TouchableOpacity onPress={() => deleteNote(note.id)} style={styles.deleteButton}>
+                        <Ionicons name="close-circle-outline" size={30}color='#FFFFFF'></Ionicons>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => updateNote(note.id)} style={styles.updateButton}>
+                        <Ionicons name="brush-outline" size={30}color='#FFFFFF'></Ionicons>
+                    </TouchableOpacity>
+                </View>
+            )
+        })}
+        </ScrollView>)
 
-          {/* <Button title='Delete' onPress={() => deleteNote(note.id)} color='#FFDD60' />
-          <Button title='Update' onPress={() => updateNote(note.id)} color='#FFC848' /> */}
-        
-        </View>
-      );
-    });
-  };
+};
 
 
   return (
