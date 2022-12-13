@@ -148,7 +148,7 @@ function Notes() {
   return (
     
     <View style={styles.container}>
-      <Text style={styles.titleFont}>Banana Book</Text>
+      {/* <Text style={styles.titleFont}>Banana Book</Text> */}
       
       <TextInput value={currentNote} 
       placeholder='start typing here...' 
@@ -328,31 +328,32 @@ const styles = StyleSheet.create({
     elevation: 10,
     marginBottom: 20,
     position: 'absolute',
-    bottom: 380,
-    left: 350,
+    top: '26.5%',
+    right: '1%'
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 20,
   },
   container: {
-    flex: 1,
+    height: '100%',
+    width: '100%',
     backgroundColor: '#FFEBB3',
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteButton: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 6,
+    paddingBottom: 6,
     backgroundColor: '#FFDD60',
     borderRadius: 15,
     shadowColor: '#000000',
     elevation: 10,
     marginBottom: 40,
     position: 'absolute',
-    left: 220,
+    left: 250,
     top: 5,
     //marginLeft: 150,
   },
@@ -396,14 +397,16 @@ const styles = StyleSheet.create({
   },
   textBox: {
     backgroundColor: '#F1F1F1',
-    paddingRight: 130,
-    paddingLeft: 130,
-    paddingBottom: 150,
-    paddingTop: 10,
+    paddingLeft: '4%',
+    paddingRight: '4%',
+    paddingTop: '4%',
     borderRadius: 10,
+    marginTop: '14%',
     position: 'relative',
     bottom: 10,
-    marginBottom: 55,
+    marginBottom: '15%',
+    width: '90%',
+    height: '24%'
   },
   textDisplay: {
     //paddingLeft: 20,
@@ -413,18 +416,17 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingLeft: 15,
     backgroundColor: '#FFFFFF',
-    marginBottom: 20,
+    marginBottom: 7,
     borderRadius: 15,
-
   },
   scrollStyle: {
     width: 350,
   },
   updateButton: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 6,
+    paddingBottom: 6,
     backgroundColor: '#FFC848',
     borderRadius: 15,
     shadowColor: '#000000',
@@ -432,7 +434,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     position: 'absolute',
     top: 5,
-    left: 280,
+    left: 295,
   },
   utilFont: {
     color: '#000000',
